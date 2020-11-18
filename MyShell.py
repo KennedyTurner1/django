@@ -10,7 +10,7 @@ from learning_logs.models import Topic
 topics = Topic.objects.all() #give me all the objects from the Topic model 
 
 for topic in topics: #iterate through all objects
-    print("Topid ID:", topic.id, " Topic:", topic)
+    print("Topic ID:", topic.id, " Topic:", topic)
     #topic.id is a sql attribute it automatically gives
     #why can we give it topic for the text instead of topic.text?
     #we defined a string method in an object, so it returns (self.text)
@@ -19,7 +19,7 @@ for topic in topics: #iterate through all objects
     #topic essentially is topic.text 
 
 t = Topic.objects.get(id=1) #we want to examine any attributes the object has
-print(t.text)
+print(t.text) #text of the topic, the name
 print(t.date_added)
 
 entries = t.entry_set.all() #we can do this because we have defined a relationship between entry and topic by a foreign key

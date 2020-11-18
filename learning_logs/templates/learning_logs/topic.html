@@ -6,16 +6,25 @@
 <!-- #this is the template and we are adding the content
 #between these two tags, tag is block content and end block content  -->
 
-<p>Topics</p>
+<p>Topic: {{ topic.text }}</p>
 
 <ul> 
     <!-- #unordered list, able to use for loop  -->
-    {% for topic in topics}
+    {% for entry in entries %}
 
-    <li>{{ topic }} </li>
+    <li>
+        
+        <p>{{ entry.date_added }}</p>
+        <p>{{ entry.text }}</p>
+
+    </li>
+
     {% empty %}
-        <li> No topics have been added yet.</li>
+
+    <li> There are no entries for this topic yet. </li>
+
     {% endfor %}
+    
 </ul>
 
 
