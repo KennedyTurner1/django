@@ -1,5 +1,6 @@
-from django.shortcuts import render
-from .models import Topic  
+from django.shortcuts import render, redirect 
+from .models import Topic, Entry
+from .forms import TopicForm, EntryForm
 
 # Create your views here.
 
@@ -29,3 +30,40 @@ def topic(request, topic_id): #this is where that variable comes into play
 
     context = {'topic':topic, 'entries':entries}
     return render(request, 'learning_logs/topic.html', context)
+
+def new_topic(request):
+    if request.method != 'POST': #if it is a get method
+        form = TopicForm()
+    else:
+        form = TopicForm(data=request.POST)
+
+        if form.is_valid():
+            form.save() #this is what the view will use to take what is on the form and put it on the database
+
+            #redirect the user to the topics page when they have used a submit button 
+            return redirect('learning_logs:topics')
+
+    context = {'form':form}
+
+    return render(request, 'learning_logs/new_topic.html', context)
+
+def new_entry(request, topic_id):
+    topic = Topic.objects.get(id=topic_id)
+    if request.method != 'POST': #if it is a get method
+        form = EntryForm()
+    else:
+        form = EntryForm(data=request.POST)
+
+        if form.is_valid():
+            
+            new_entry = form.save(commit=False) #this is what the view will use to take what is on the form and put it on the database
+            new_entry.topic = topic 
+            new_entry.save()
+            form.save()
+            #redirect the user to the topics page when they have used a submit button 
+            return redirect('learning_logs:topic', topic_id=topic_id)
+
+    context = {'form':form, 'topic':topic}
+
+    return render(request, 'learning_logs/new_entry.html', context)
+
