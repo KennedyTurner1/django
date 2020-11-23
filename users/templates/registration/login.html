@@ -1,0 +1,23 @@
+{% extends "learning_logs/base.html" %}
+
+    {% block content %}
+
+    <!-- #if what they type has an error, display error message -->
+    {% if form.errors %}
+    <p>Your username and password didn't match. Please try again</p>
+    {% endif %}
+
+        <!-- #define the form and tell the browser where to send the data 
+        #submitted in the form, the method is a post method -->
+        <form action="{% url 'users:login' %}" method='post'>
+
+            {% csrf_token %}
+
+            {{form.as_p}}
+
+            <button name="submit">Login</button>
+            <input type="hidden" name="next"
+            value="{% url 'learning_logs:index' %}" />
+        </form>
+
+    {% endblock content %} 

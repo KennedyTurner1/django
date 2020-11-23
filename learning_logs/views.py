@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect 
-from .models import Topic, Entry
+from .models import Topic, Entry #have to import the model to have access to the model
 from .forms import TopicForm, EntryForm
 
 # Create your views here.
@@ -50,7 +50,7 @@ def new_topic(request):
 def new_entry(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
     if request.method != 'POST': #if it is a get method
-        form = EntryForm()
+        form = EntryForm() #creates just a blank form not associated to any entry
     else:
         form = EntryForm(data=request.POST)
 
@@ -64,6 +64,22 @@ def new_entry(request, topic_id):
             return redirect('learning_logs:topic', topic_id=topic_id)
 
     context = {'form':form, 'topic':topic}
-
+ 
     return render(request, 'learning_logs/new_entry.html', context)
+
+def edit_entry(request, entry_id):
+    entry = Entry.objects.get(id=entry_id) #this is an instance of the model Entry
+    topic = entry.topic #we have defined the topic that we are using
+
+    if request.method != 'POST': #we want to edit an existing entry
+        form = EntryForm(instance=entry) #instance belongs to the entry we just created
+    else: #if not a post request but a get request
+        form = EntryForm(instance=entry, data=request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('learning_logs:topic', topic_id=topic.id) #after they have clicked save, then they will be redirected to where
+
+    context = {'entry':entry, 'topic':topic, 'form':form} #the context is the context given to the skeleton
+    return render(request, 'learning_logs/edit_entry.html', context) #the template is a skeleton, but it doesnt have the content
+
 

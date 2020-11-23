@@ -1,6 +1,18 @@
 <p>
-    <a href="{% url 'learning_logs:index' %}">Learning Logs</a>
-    <a href="{% url 'learning_logs:topics' %}">Topics</a>
+<a href="{% url 'learning_logs:index' %}">Learning Logs</a>
+<a href="{% url 'learning_logs:topics' %}">Topics</a>
+
+{% if user.is_authenticated %}
+    Hello, {{user.username}}.
+    <a href="{% url 'users:logout' %}">Log out</a>
+{% else %}
+    <a href="{% url 'users:login' %}">Log in</a>
+{% endif %}
 </p>
+
+
+
+<!-- ###
+these are the base hyperlinks that stay the same no matter where we click...this is the base that each file pulls from  -->
 
 {% block content %} {% endblock content %}

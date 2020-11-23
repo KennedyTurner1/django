@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     #my apps
     'learning_logs', #this is the app I just created
+    'users', #new for users to be added
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
