@@ -1,5 +1,4 @@
 from django.urls import path 
-
 from .import views #importing views from our url file
 
 app_name = 'learning_logs'

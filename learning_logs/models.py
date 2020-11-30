@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 # Think of models as tables, and the attributes are text and date added. 
@@ -8,7 +9,9 @@ class Topic(models.Model):
     text = models.CharField(max_length=200)
     date_added = models.DateTimeField(auto_now_add=True)
     #two attributes, text and date_added 
-
+    owner = models.ForeignKey(User, on_delete=models.CASCADE) #User is a django model
+    #we want to associate topics with each user 
+    
     def __str__(self): #string method returns something useful instead of garbage
         return self.text 
 

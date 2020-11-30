@@ -1,19 +1,22 @@
 from django.shortcuts import render, redirect 
 from .models import Topic, Entry #have to import the model to have access to the model
 from .forms import TopicForm, EntryForm
-
+from django.contrib.auth.decorators import login_required #decorator
+from django.http import Http404 #404 error
 # Create your views here.
 
 #get some help on these
 
+@login_required
 def index(request): #the first argument is always a request for a view because they want information
     #we want to replace the django homepage (rocket) with our homepage
     return render(request, 'learning_logs/index.html')
 
 #to get all topics
+@login_required
 def topics(request): #this is the topics view, the view is the go between for the html template and the database
     #brings in an object from the models file, which is the database, and saves it as a list of objects
-    topics = Topic.objects.order_by('date_added') #order_by is the sort
+    topics = Topic.objects.filter(owner=request.user).order_by('date_added') #order_by is the sort according to each user logged in
 
     context = {'topics':topics} #template tag topics
 
@@ -24,13 +27,19 @@ def topics(request): #this is the topics view, the view is the go between for th
     #it will call the html page and then go to the topics html, and it will display it on the userface
 
 #to get individual topics
+@login_required
 def topic(request, topic_id): #this is where that variable comes into play
     topic = Topic.objects.get(id=topic_id)
+
+    if topic.owner != request.user:
+        raise Http404
+
     entries = topic.entry_set.order_by('-date_added')
 
     context = {'topic':topic, 'entries':entries}
     return render(request, 'learning_logs/topic.html', context)
 
+@login_required
 def new_topic(request):
     if request.method != 'POST': #if it is a get method
         form = TopicForm()
@@ -38,8 +47,9 @@ def new_topic(request):
         form = TopicForm(data=request.POST)
 
         if form.is_valid():
-            form.save() #this is what the view will use to take what is on the form and put it on the database
-
+            new_topic = form.save(commit=False) #this is what the view will use to take what is on the form and put it on the database
+            new_topic.owner = request.user
+            new_topic.save()
             #redirect the user to the topics page when they have used a submit button 
             return redirect('learning_logs:topics')
 
@@ -47,8 +57,12 @@ def new_topic(request):
 
     return render(request, 'learning_logs/new_topic.html', context)
 
+@login_required
 def new_entry(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
+    if topic.owner != request.user:
+        raise Http404
+    
     if request.method != 'POST': #if it is a get method
         form = EntryForm() #creates just a blank form not associated to any entry
     else:
@@ -67,9 +81,13 @@ def new_entry(request, topic_id):
  
     return render(request, 'learning_logs/new_entry.html', context)
 
+@login_required
 def edit_entry(request, entry_id):
     entry = Entry.objects.get(id=entry_id) #this is an instance of the model Entry
     topic = entry.topic #we have defined the topic that we are using
+
+    if topic.owner != request.user:
+        raise Http404
 
     if request.method != 'POST': #we want to edit an existing entry
         form = EntryForm(instance=entry) #instance belongs to the entry we just created
